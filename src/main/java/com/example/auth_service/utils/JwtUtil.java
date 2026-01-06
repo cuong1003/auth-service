@@ -1,5 +1,6 @@
 package com.example.auth_service.utils;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -27,6 +28,38 @@ public class JwtUtil {
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 15 * 60))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    public boolean validateToken(String token) {
+        try {
+            byte[] keyByte = Base64.getDecoder().decode(secretKey);
+            Key key = Keys.hmacShaKeyFor(keyByte);
+            Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private Claims extractAllClaims(String token) {
+        byte[] keyByte = Base64.getDecoder().decode(secretKey);
+        Key key = Keys.hmacShaKeyFor(keyByte);
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+    public String extractSubject(String token) {
+        Claims claims = extractAllClaims(token);
+        return claims.getSubject(); // Trả về nội dung trong trường "sub"
+    }
+    public String extractRole(String token) {
+        Claims claims = extractAllClaims(token);
+        return claims.get("role", String.class);
     }
 
 

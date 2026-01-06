@@ -4,6 +4,8 @@ import com.example.auth_service.Models.Dto.LoginRequest;
 import com.example.auth_service.Models.Entity.User;
 import com.example.auth_service.Repository.UserRepository;
 import com.example.auth_service.utils.JwtUtil;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -39,13 +41,19 @@ public class ViewController {
     }
 
     @PostMapping("/login")
-    public String login(@ModelAttribute LoginRequest req, Model model) {
+    public String login(@ModelAttribute LoginRequest req,
+                        Model model, HttpServletResponse res) {
         User user = userRepository.findByUsername(req.getUsername());
         if (user != null && passwordEncoder.matches(req.getPassword(), user.getPassword())) {
             String token = jwtUtil.generateToken(user.getUsername(), user.getRole());
-            System.out.println(token);
+            Cookie cookie = new Cookie("AUTH_TOKEN", token);
+            cookie.setHttpOnly(true);
+            cookie.setSecure(false);
+            cookie.setPath("/");
+            cookie.setMaxAge(60 * 60 * 24 * 7);
+            res.addCookie(cookie);
             model.addAttribute("message", "Chào " + req.getUsername());
-            return "dashboard";
+            return "redirect:/dashboard";
         }
         model.addAttribute("message", "Sai tài khoản hoặc mật khẩu");
         return "login";
