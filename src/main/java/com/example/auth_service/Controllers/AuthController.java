@@ -22,12 +22,13 @@ public class AuthController {
     public ResponseEntity<?> signUp(@RequestBody SignUpRequest req) {
         if (userRepository.findByUsername(req.getUsername()) != null) {
             return ResponseEntity.badRequest().body("Tên đăng nhập đã tồi tại");
-        } else if (!req.getUsername().equals(req.getRepeatPassword())) {
+        } else if (!req.getPassword().equals(req.getRepeatPassword())) {
             return ResponseEntity.badRequest().body("Mật khẩu không khớp");
         } else {
             User newUser = new User();
             newUser.setUsername(req.getUsername());
             newUser.setPassword(passwordEncoder.encode(req.getPassword()));
+            newUser.setRole(req.getRole());
             userRepository.save(newUser);
         }
         return ResponseEntity.ok().body("Tạo tài khoản thành công");
