@@ -1,5 +1,7 @@
 server:
   port: 6969
+  # NATIVE: giữ nguyên tất cả headers từ request
+  forward-headers-strategy: native
 spring:
   application:
     name: auth-service

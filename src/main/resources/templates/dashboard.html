@@ -1,9 +1,9 @@
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Document</title>
+    <title>Dashboard</title>
 </head>
 
 <body>
@@ -12,7 +12,7 @@
         quod. Aliquid amet aspernatur, culpa dicta, doloremque in inventore maiores natus tempore ullam unde
         voluptate.</em>
 
-    <form action="/do-logout" method="post">
+    <form th:action="${prefix} + '/do-logout'" method="post">
         <button type="submit">Logout</button>
     </form>
 </body>
