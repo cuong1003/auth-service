@@ -3,8 +3,7 @@ name: CI/CD Auth Service
 on:
   push:
     branches: [ "main" ]
-    paths:
-      - 'auth-service/**'  # Chỉ trigger khi có thay đổi trong auth-service
+    # Bỏ path filter vì đây là repo riêng cho auth-service
 
   # Cho phép trigger thủ công từ GitHub Actions tab
   workflow_dispatch:
@@ -12,10 +11,6 @@ on:
 jobs:
   deploy:
     runs-on: self-hosted
-    
-    defaults:
-      run:
-        working-directory: ./auth-service
 
     steps:
       - name: Checkout code
