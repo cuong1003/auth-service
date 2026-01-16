@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  auth-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: auth-service
+    ports:
+      - "6969:6969"
+    environment:
+      # Database connection - điều chỉnh theo server của bạn
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://192.168.1.109:5432/homelab_auth
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD:-your_db_password}
+      # Redis connection
+      - SPRING_DATA_REDIS_HOST=192.168.1.109
+      - SPRING_DATA_REDIS_PORT=6379
+      - SPRING_DATA_REDIS_PASSWORD=${REDIS_PASSWORD:-123123}
+      # JWT Secret (nên dùng biến môi trường trên server)
+      - JWT_SECRET=${JWT_SECRET:-b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZWQyNTUxOQAAACD/95aZ5eSSQZ+r9ffcdOwR3rW0Tyl0q4bgBXmpTI29JAAAAKDVkaK91ZGivQAAAAtzc2gtZWQyNTUxOQAAACD/95aZ5eSSQZ+r9ffcdOwR3rW0Tyl0q4bgBXmpTI29JAAAAEDglyZWnG1O9wXKqPfJaZDipAti8D1bZ2WPkboXB/caRf/3lpnl5JJBn6v199x07BHetbRPKXSrhuAFealMjb0kAAAAFnlvdXJfZW1haWxAZXhhbXBsZS5jb20BAgMEBQYH}
+    restart: unless-stopped
+    networks:
+      - homelab-network
+
+networks:
+  homelab-network:
+    driver: bridge

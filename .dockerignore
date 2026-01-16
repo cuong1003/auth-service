@@ -1,0 +1,36 @@
+# Build outputs
+target/
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+
+# Git
+.git/
+.gitignore
+
+# GitHub Actions (không cần trong Docker image)
+.github/
+
+# Maven wrapper (đã có trong base image)
+# Nếu muốn dùng mvnw local thì bỏ comment dưới này
+# .mvn/
+# mvnw
+# mvnw.cmd
+
+# Logs
+*.log
+logs/
+
+# Test files
+src/test/
+
+# Documentation
+*.md
+docs/
+
+# Docker files (không cần copy chính nó)
+Dockerfile
+docker-compose.yml
+.dockerignore
