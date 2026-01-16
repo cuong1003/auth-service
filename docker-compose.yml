@@ -9,19 +9,55 @@ services:
     ports:
       - "6969:6969"
     environment:
-      # Database connection - điều chỉnh theo server của bạn
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://192.168.1.109:5432/homelab_auth
+      # Database connection - dùng tên container
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/homelab_auth
       - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD:-your_db_password}
-      # Redis connection
-      - SPRING_DATA_REDIS_HOST=192.168.1.109
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD:-123123}
+      # Redis connection - dùng tên container
+      - SPRING_DATA_REDIS_HOST=redis
       - SPRING_DATA_REDIS_PORT=6379
       - SPRING_DATA_REDIS_PASSWORD=${REDIS_PASSWORD:-123123}
-      # JWT Secret (nên dùng biến môi trường trên server)
+      # JWT Secret
       - JWT_SECRET=${JWT_SECRET:-b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZWQyNTUxOQAAACD/95aZ5eSSQZ+r9ffcdOwR3rW0Tyl0q4bgBXmpTI29JAAAAKDVkaK91ZGivQAAAAtzc2gtZWQyNTUxOQAAACD/95aZ5eSSQZ+r9ffcdOwR3rW0Tyl0q4bgBXmpTI29JAAAAEDglyZWnG1O9wXKqPfJaZDipAti8D1bZ2WPkboXB/caRf/3lpnl5JJBn6v199x07BHetbRPKXSrhuAFealMjb0kAAAAFnlvdXJfZW1haWxAZXhhbXBsZS5jb20BAgMEBQYH}
     restart: unless-stopped
     networks:
       - homelab-network
+    depends_on:
+      - postgres
+      - redis
+
+  # Redis - chạy cùng network
+  redis:
+    image: redis:alpine
+    container_name: redis
+    command: redis-server --requirepass "123123"
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - homelab-network
+
+  # PostgreSQL - chạy cùng network
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "123123"
+      POSTGRES_DB: homelab_auth
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - homelab-network
+
+volumes:
+  redis_data:
+  postgres_data:
 
 networks:
   homelab-network:
