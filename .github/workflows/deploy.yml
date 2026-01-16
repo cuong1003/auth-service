@@ -1,0 +1,44 @@
+name: CI/CD Auth Service
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'auth-service/**'  # Chỉ trigger khi có thay đổi trong auth-service
+
+  # Cho phép trigger thủ công từ GitHub Actions tab
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    
+    defaults:
+      run:
+        working-directory: ./auth-service
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Stop old container (if running)
+        run: docker compose down || true
+        continue-on-error: true
+
+      - name: Build and Start container
+        env:
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        run: docker compose up -d --build
+
+      - name: Clean up old images
+        run: docker image prune -f
+        continue-on-error: true
+
+      - name: Health check
+        run: |
+          echo "Waiting for service to start..."
+          sleep 30
+          curl -f http://localhost:6969/login || echo "Health check warning: service may still be starting"
+        continue-on-error: true
