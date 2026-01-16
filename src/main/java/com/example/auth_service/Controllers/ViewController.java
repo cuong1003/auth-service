@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.util.Enumeration;
 import java.util.concurrent.TimeUnit;
 
 @Controller
@@ -35,7 +36,7 @@ public class ViewController {
         String prefix = getPrefix(req);
         // Debug: In ra tất cả headers để kiểm tra
         System.out.println("=== DEBUG HEADERS ===");
-        java.util.Enumeration<String> headerNames = req.getHeaderNames();
+        Enumeration<String> headerNames = req.getHeaderNames();
         while (headerNames.hasMoreElements()) {
             String name = headerNames.nextElement();
             System.out.println(name + ": " + req.getHeader(name));
@@ -54,6 +55,17 @@ public class ViewController {
 
     @GetMapping("/dashboard")
     public String dashboard(HttpServletRequest req, Model model) {
+        String token = "";
+        Cookie[] cookies = req.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("AUTH_TOKEN")) {
+                    token=cookie.getValue();
+                }
+            }
+        }
+        String role = jwtUtil.extractRole(token);
+        model.addAttribute("role", role);
         model.addAttribute("prefix", getPrefix(req));
         return "dashboard";
     }
